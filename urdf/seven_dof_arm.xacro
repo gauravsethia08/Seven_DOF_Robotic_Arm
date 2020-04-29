@@ -1,0 +1,510 @@
+<?xml version="1.0"?>
+
+<!--Defining Robot-->
+<robot name = "seven_dof_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+	
+	<!--Defining Constants-->
+	<property name = "deg_to_rad" value = "0.01745329251994329577"/>
+	<property name= "M_PI" value = "3.14159"/>
+	<property name = "M_SCALE" value = "0.1 0.1 0.1"/>
+	
+	<!--Shoulder Pan Link Properties-->
+	<property name = "shoulder_pan_width" value = "0.04"/>
+	<property name = "shoulder_pan_length" value = "0.08"/>
+	
+	<!--Shoulder Pitch Link Properties-->
+	<property name = "shoulder_pitch_length" value = "0.14"/>
+	<property name = "shoulder_pitch_width" value = "0.04"/>
+	<property name = "shoulder_pitch_height" value = "0.04"/>
+	 
+	 <!--Elbow Roll Link Properties-->
+	 <property name = "elbow_roll_width" value = "0.02"/>
+	 <property name = "elbow_roll_length" value = "0.06"/>
+	 
+	 <!--Elbow Pitch Link Properties-->
+	 <property name = "elbow_pitch_length" value = "0.22"/>
+	 <property name = "elbow_pitch_width" value = "0.04"/>
+	 <property name = "elbow_pitch_height" value = "0.04"/>
+	 
+	 <!--Wrist Roll Link Properties-->
+	 <property name = "wrist_roll_width" value = "0.02"/>
+	 <property name = "wrist_roll_length" value = "0.04"/> 
+	 
+	 <!--Wrist Pitch Link Properties-->
+	 <property name = "wrist_pitch_length" value = "0.06"/>
+	 <property name = "wrist_pitch_width" value = "0.04"/>
+	 <property name = "wrist_pitch_height" value = "0.04"/>
+	 
+	 <!--Gripper Roll Link Properties-->
+	 <property name = "gripper_roll_width" value = "0.04"/>
+	 <property name = "gripper_roll_length" value = "0.02"/>
+	 
+	 <!--Left Gripper Properties-->
+	 <property name = "left_gripper_length" value = "0.08"/>
+	 <property name = "left_gripper_width" value = "0.01"/>
+	 <property name = "left_gripper_height" value = "0.01"/>
+	 
+	 <!--Right Gripper Properties-->
+	 <property name = "right_gripper_length" value = "0.08"/>
+	 <property name = "right_gripper_width" value = "0.01"/>
+	 <property name = "right_gripper_height" value ="0.01"/>
+	 
+	 <!--Right Gripper Grasping Property-->
+	 <property name = "grasp_frame_length" value = "0.02"/>
+	 <property name = "grasp_frame_width" value = "0.02"/>
+	 <property name = "grasp_frame_height" value = "0.02"/>
+	 
+	 <!--Defining Materials-->
+	 <!--Black Material-->
+	 <material name = "black">
+	 	<color rgba = "0 0 0 1"/> 
+	 </material>
+	 
+	 <!--White Material-->
+	 <material name = "white">
+	 	<color rgba = "1 1 1 1"/>
+	 </material>
+	 
+	 <!--Red Material-->
+	 <material name = "red">
+	 	<color rgba = "0.8 0 0 1"/>
+	 </material>
+	 
+	 <!--Defining Marcos for inertial matrix-->
+	 <xacro:macro name = "inertial_matrix" params = "mass">
+	 	<inertial>
+	 		<mass value = "${mass}"/>
+	 		<inertia ixx = "1.0" ixy = "0.0" ixz = "0.0" iyy = "1.0" iyz = "0.0" izz = "1.0"/>  
+	 	</inertial>
+	 </xacro:macro>
+	 	
+	 <!--Defining Marcos for Transmission of Box-->
+	 <xacro:macro name = "transmission_block" params = "joint_name">
+	 	<transmission name = "t1">
+	 		<!--Type of Transmission-->
+	 		<type>transmission_interace/SimpleTransmission</type>
+	 		<!--Joint for transmission-->
+	 		<joint name = "${joint_name}">
+	 			<hardwareInterface>PositionJointInterface</hardwareInterface>
+	 		</joint>
+	 		<!--Actuator-->
+	 		<actuator name = "motor1">
+	 			<hardwareInterface>PositionJointInterface</hardwareInterface>
+	 			<mechanicalReduction>1</mechanicalReduction>
+	 		</actuator>
+	 	</transmission>
+	 </xacro:macro>
+	 
+	 <!--/////////////////////////////////////////////////////__Bottom Fixed Link__////////////////////////////////////////////////////////////////////-->
+	 
+	 <link name = "bottom_link">
+	 	<!--Visualisation of robot-->
+	 	<visual>
+	 		<!--Origin-->
+	 		<origin xyz = "0 0 -0.04" rpy = "0 0 0"/>
+	 		<!--Geometry-->
+	 		<geometry>
+	 			<!--Box-->
+	 			<box size = "1 1 0.02"/>
+	 		</geometry>
+	 		<!--Material-->
+	 		<material name = "brown"/>
+	 	</visual>
+	 	<!--Collision-->
+	 	<collision>
+	 		<!--Origin-->
+	 		<origin xyz = "0 0 -0.04" rpy = "0 0 0"/>
+	 		<!--Geometry-->
+	 		<geometry>
+	 			<box size = "1 1 0.02"/>
+	 		</geometry>
+	 	</collision>
+	 </link>
+	 
+	 <!--Adding Gazebo reference-->
+	 <gazebo reference = "bottom_link">
+	 	<material>Gazebo/White</material>
+	 </gazebo>
+	 
+	 <joint name = "bottom_joint" type = "fixed">
+	 	<!--Origin-->
+	 	<origin xyz = "0 0 0" rpy = "0 0 0"/>
+	 	<!--Parent Link-->
+	 	<parent link = "base_link"/>
+	 	<!--Child Link-->
+	 	<child link = "bottom_link"/>
+	 </joint>
+	 
+	 <!--/////////////////////////////////////////////////////__Base Link__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "base_link">
+		<!--Visualization-->
+		<visual>
+			<origin xyz = "0 0 0" rpy = "${M_PI/2} 0 0"/> <!--Rotating pi2-->
+			<geometry>
+				<box size = "0.1 0.1 0.1"/>
+			</geometry> 
+			<material name = "white"/>
+		</visual>
+		<!--Collision-->
+		<collision>
+			<origin xyz = "0 0 0" rpy = "${M_PI/2} 0 0"/> <!--Rotating pi2-->
+			<geometry>
+				<box size = "0.1 0.1 0.1"/>
+			</geometry> 
+		</collision>
+		<!--Physical Properties/Inertia-->
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+
+	<!--Gazebo Reference-->
+	<gazebo reference = "base_link">
+		<material>Gazebo/White</material>
+	</gazebo>
+	
+	<!--Joint-->
+	<joint name = "shoulder_pan_joint" type = "revolute">
+		<origin xyz = "0 0 0.05" rpy = "0 ${M_PI/2} ${M_PI*0}"/>
+		<axis xyz = "-1 0 0"/>
+		<parent link = "base_link"/>
+		<child link = "shoulder_pan_link"/>
+		<limit effort = "300" velocity = "1" lower = "${deg_to_rad*-150}" upper = "${deg_to_rad*114}"/>
+		<dynamics damping = "50" friction = "1"/>
+	</joint>
+	
+	 <!--/////////////////////////////////////////////////////__Shoulder Pan Link__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "shoulder_pan_link">
+		<visual>
+			<origin xyz = "0 0 0" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<cylinder length = "${shoulder_pan_length}" radius = "${shoulder_pan_width}"/>
+			</geometry>
+			<material name = "red"/>
+		</visual>
+		<collision>
+			<origin xyz = "0 0 0" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<cylinder length = "${shoulder_pan_length}" radius = "${shoulder_pan_width}"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+	
+	<!--Gazebo Reference-->
+	<gazebo reference = "shoulder_pan_link">
+		<material>Gazebo/Red</material>
+	</gazebo>
+	
+	<!--Joint-->
+	<joint name = "shoulder_pitch_joint" type = "revolute">
+		<origin xyz = "-0.041 0.0021 0" rpy = "${-M_PI/2} 0 ${M_PI/2}"/>
+		<axis xyz = "1 0 0"/>
+		<parent link = "shoulder_pan_link"/>
+		<child link = "shoulder_pitch_link"/>
+		<limit effort = "300" velocity = "1" lower = "${deg_to_rad*-67}" upper = "${deg_to_rad*109}"/>
+		<dynamics dmaping = "50" friction = "1"/>
+	</joint>
+	
+	<!--/////////////////////////////////////////////////////__Shoulder Pitch Link__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "shoulder_pitch_link">
+		<visual>
+			<origin xyz = "-0.002 0 0.04" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<box size = "${shoulder_pitch_length} ${shoulder_pitch_width} ${shoulder_pitch_height}"/>
+			</geometry>
+			<material name = "white"/>
+		</visual>
+		<collision>
+			<origin xyz = "-0.002 0 0.04" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<box size = "${shoulder_pitch_length} ${shoulder_pitch_width} ${shoulder_pitch_height}"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+	
+	<!--Gazebo Reference-->
+	<gazebo reference = "shoulder_pitch_link">
+		<material>Gazebo/White</material>
+	</gazebo>
+	
+	<!--Joint-->
+	<joint name = "elbow_roll_joint" type = "revolute">
+		<origin xyz = "-0.002 0 0.1206" rpy = "${M_PI} 0 ${M_PI/2}"/>
+		<axis xyz = "-1 0 0"/>
+		<parent link = "shoulder_pitch_link"/>
+		<child link = "elbow_roll_link"/>
+		<limit effort = "300" velocity = "1" lower = "${deg_to_rad*-150}" upper = "${deg_to_rad*41}"/>
+		<dynamics dmaping = "50" friction = "1"/>
+	</joint>
+	
+	<!--/////////////////////////////////////////////////////__Elbow Roll Link__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "elbow_roll_link">
+		<visual>
+			<origin xyz = "-0.015 0 -0" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<cylinder length = "${elbow_roll_length}" radius = "${elbow_roll_width}"/>
+			</geometry>
+			<material name = "black"/>
+		</visual>
+		<collision>
+			<origin xyz = "-0.015 0 -0" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<cylinder length = "${elbow_roll_length}" radius = "${elbow_roll_width}"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+	
+	<!--Gazebo Reference-->
+	<gazebo reference = "elbow_roll_link">
+		<material>Gazebo/Black</material>
+	</gazebo>
+	
+	<!--Joint-->
+	<joint name = "elbow_pitch_joint" type = "revolute">
+		<origin xyz = "-0.035 0 0" rpy = "0.055 ${M_PI/2} 0"/>
+		<axis xyz = "1 0 0"/>
+		<parent link = "elbow_roll_link"/>
+		<child link = "elbow_pitch_link"/>
+		<limit effort = "300" velocity = "1" lower = "${deg_to_rad*-92}" upper = "${deg_to_rad*110}"/>
+		<dynamics dmaping = "50" friction = "1"/>
+	</joint>
+	
+	<!--/////////////////////////////////////////////////////__Elbow Pitch Link__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "elbow_pitch_link">
+		<visual>
+			<origin xyz = "0 0 -0.12" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<box size = "${elbow_pitch_length} ${elbow_pitch_width} ${elbow_pitch_height}"/>
+			</geometry>
+			<material name = "red"/>
+		</visual>
+		<collision>
+			<origin xyz = "0 0 -0.12" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<box size = "${elbow_pitch_length} ${elbow_pitch_width} ${elbow_pitch_height}"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+	
+	<!--Gazebo Reference-->
+	<gazebo reference = "elbow_pitch_link">
+		<material>Gazebo/Red</material>
+	</gazebo>
+	
+	<!--Joint-->
+	<joint name = "wrist_roll_joint" type = "revolute">
+		<origin xyz = "0 0.0081 -0.248" rpy = "0 ${M_PI/2} ${M_PI}"/>
+		<axis xyz = "1 0 0"/>
+		<parent link = "elbow_pitch_link"/>
+		<child link = "wrist_roll_link"/>
+		<limit effort = "300" velocity = "1" lower = "${deg_to_rad*-150}" upper = "${deg_to_rad*150}"/>
+		<dynamics dmaping = "50" friction = "1"/>
+	</joint>
+	
+	<!--/////////////////////////////////////////////////////__Wrist Roll Link__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "wrist_roll_link">
+		<visual>
+			<origin xyz = "0 0 0" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<cylinder length = "${wrist_roll_length}" radius = "${wrist_roll_width}"/>
+			</geometry>
+			<material name = "black"/>
+		</visual>
+		<collision>
+			<origin xyz = "0 0 0" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<cylinder length = "${wrist_roll_length}" radius = "${wrist_roll_width}"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+	
+	<!--Gazebo Reference-->
+	<gazebo reference = "wrist_roll_link">
+		<material>Gazebo/Black</material>
+	</gazebo>
+	
+	<!--Joint-->
+	<joint name = "wrist_pitch_joint" type = "revolute">
+		<origin xyz = "0 0 0.0001" rpy = "0 ${M_PI/2} 0"/>
+		<axis xyz = "1 0 0"/>
+		<parent link = "wrist_roll_link"/>
+		<child link = "wrist_pitch_link"/>
+		<limit effort = "300" velocity = "1" lower = "${deg_to_rad*92}" upper = "${deg_to_rad*113}"/>
+		<dynamics dmaping = "50" friction = "1"/>
+	</joint>
+	
+	<!--/////////////////////////////////////////////////////__Wrist Pitch Link__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "wrist_pitch_link">
+		<visual>
+			<origin xyz = "0 0 0.04" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<box size = "${wrist_pitch_length} ${wrist_pitch_width} ${wrist_pitch_height}"/>
+			</geometry>
+			<material name = "white"/>
+		</visual>
+		<collision>
+			<origin xyz = "0 0 0.04" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<box size = "${wrist_pitch_length} ${wrist_pitch_width} ${wrist_pitch_height}"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+	
+	<!--Gazebo Reference-->
+	<gazebo reference = "wrist_pitch_link">
+		<material>Gazebo/White</material>
+	</gazebo>
+	
+	<!--Joint-->
+	<joint name = "gripper_roll_joint" type = "revolute">
+		<origin xyz = "0 0 0.08" rpy = "${1.5*M_PI} ${-0.5*M_PI} 0"/>
+		<axis xyz = "1 0 0"/>
+		<parent link = "wrist_pitch_link"/>
+		<child link = "gripper_roll_link"/>
+		<limit effort = "300" velocity = "1" lower = "${deg_to_rad*-150}" upper = "${deg_to_rad*150}"/>
+		<dynamics dmaping = "50" friction = "1"/>
+	</joint>
+	
+	<!--/////////////////////////////////////////////////////__Gripper Roll Link__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "gripper_roll_link">
+		<visual>
+			<origin xyz = "0 0 0" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<cylinder length = "${gripper_roll_length}" radius = "${gripper_roll_width}"/>
+			</geometry>
+			<material name = "red"/>
+		</visual>
+		<collision>
+			<origin xyz = "0 0 0" rpy = "0 ${M_PI/2} 0"/>
+			<geometry>
+				<cylinder length = "${gripper_roll_length}" radius = "${gripper_roll_width}"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+	
+	<!--Gazebo Reference-->
+	<gazebo reference = "gripper_roll_link">
+		<material>Gazebo/Red</material>
+	</gazebo>
+	
+	<!--Joint-->
+	<joint name = "finger_joint1" type = "prismatic">
+		<origin xyz = "0 0 0"/>
+		<axis xyz = "0 1 0"/>
+		<parent link = "gripper_roll_link"/>
+		<child link = "gripper_final_link1"/>
+		<limit effort = "100" velocity = "1" lower = "0" upper = "0.03"/>
+		<!--Safety Controller-->
+		<safety_controller k_position = "20" k_velocity = "20" soft_lower_limit = "${-0.15}" soft_upper_limit = "${0.0}"/>
+		<dynamics dmaping = "50" friction = "1"/>
+	</joint>
+	
+	<!--/////////////////////////////////////////////////////__Left Gripper AFT Link__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "gripper_final_link1">
+		<visual>
+			<origin xyz = "0.04 -0.03 0"/>
+			<geometry>
+				<box size = "${left_gripper_length} ${left_gripper_width} ${left_gripper_height}"/>
+			</geometry>
+			<material name = "white"/>
+		</visual>
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+	
+	<!--Gazebo Reference-->
+	<gazebo reference = "l_gripper_aft_link">
+		<material>Gazebo/White</material>
+	</gazebo>
+	
+	<!--Joint-->
+	<joint name = "finger_joint2" type = "prismatic">
+		<origin xyz = "0 0 0"/>
+		<axis xyz = "0 1 0"/>
+		<parent link = "gripper_roll_link"/>
+		<child link = "gripper_final_link2"/>
+		<limit effort = "1" velocity = "1" lower = "-0.03" upper = "0"/>
+		<dynamics dmaping = "50" friction = "1"/>
+	</joint>
+	
+	<!--/////////////////////////////////////////////////////__Right Gripper AFT Link__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "gripper_final_link2">
+		<visual>
+			<origin xyz = "0.04 0.03 0"/>
+			<geometry>
+				<box size = "${right_gripper_length} ${right_gripper_width} ${right_gripper_height}"/>
+			</geometry>
+			<material name = "white"/>
+		</visual>
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+	
+	<!--Gazebo Reference-->
+	<gazebo reference = "r_gripper_aft_link">
+		<material>Gazebo/White</material>
+	</gazebo>
+	
+	<!--/////////////////////////////////////////////////////__Grasping Frame__////////////////////////////////////////////////////////////////////-->
+
+	<link name = "grasping_frame">
+		<inertial>
+			<origin xyz = "0 0 0" rpy = "0 0 0"/>
+			<mass value = "0.0001"/>
+			<cuboid_inertia mass = "0.0001" x = "0.0001" y = "0.0001" z = "0.0001"/>
+			<inertia ixx = "1.0" ixy = "0.0" ixz = "0.0" iyy ="100.0" iyz = "0.0" izz = "0.0"/>
+		</inertial>
+		<visual>
+			<origin xyz = "0 0 0"/>
+			<geometry>
+				<box size = "${grasp_frame_length} ${grasp_frame_width} ${grasp_frame_height}"/>
+			</geometry>
+			<material name = "white"/>
+		</visual>
+		<xacro:inertial_matrix mass = "1"/>
+	</link>
+	
+	<!--Joint-->
+	<joint name = "grasping_frame_joint" type = "fixed">
+		<origin xyz = "0.08 0 0" rpy = "0 0 0"/>
+		<parent link = "gripper_roll_link"/>
+		<child link = "grasping_frame"/>
+	</joint>
+	
+	<!-- including another file
+	<xacro:include filename="$(find seven_dof_arm)/urdf/sensors/xtion_pro_live.urdf.xacro"/>-->
+	
+	<!--/////////////////////////////////////////////////////__Transmission for ROS Control__////////////////////////////////////////////////////////////////////-->
+	<xacro:transmission_block joint_name = "shoulder_pan_joint"/>
+	<xacro:transmission_block joint_name = "shoulder_pitch_joint"/>
+	<xacro:transmission_block joint_name = "elbow_roll_joint"/>
+	<xacro:transmission_block joint_name = "elbow_pitch_joint"/>
+	<xacro:transmission_block joint_name = "wrist_roll_joint"/>
+	<xacro:transmission_block joint_name = "wrist_pitch_joint"/>
+	<xacro:transmission_block joint_name = "gripper_roll_joint"/>
+	<xacro:transmission_block joint_name = "finger_joint1"/>
+	<xacro:transmission_block joint_name = "finger_joint2"/>
+  	
+  	<!-- ros_control plugin -->
+	<gazebo>
+		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+			<robotNamespace>/seven_dof_arm</robotNamespace>
+		</plugin>
+	</gazebo>
+	
+</robot>
