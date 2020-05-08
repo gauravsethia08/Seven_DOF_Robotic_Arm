@@ -12,3 +12,6 @@ $ roslaunch seven_dof_arm view_arm.launch
 ````
 ### View in rviz
 ![Robotic_Arm](images/seven_dof_robotic_arm.png)
+
+### Graphical Representation
+![Graphical Representation](images/graphical_representation.jpg)
